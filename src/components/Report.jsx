@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function Report() {
 
+  const [preview, setPreview] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -10,6 +11,7 @@ function Report() {
     description: "",
     file: null, 
    });
+
   const [fileName, setFileName] = useState("No file chosen");
 
 
@@ -24,9 +26,10 @@ function Report() {
 
   function handleFileChange(e) {
   const file = e.target.files[0];
-  setFormData({ ...formData, file });
-
-      if (file) {
+  
+    if (file) {
+        setFormData({ ...formData, file });
+        setPreview(URL.createObjectURL(file));
         setFileName(file.name);
       }
     }
@@ -34,8 +37,27 @@ function Report() {
 
    function handleSubmit(e) {
     e.preventDefault();
-    console.log(formData);
-    alert("Report submitted");
+
+    const oldReports = JSON.parse(localStorage.getItem("reports")) || [];
+    oldReports.push({...formData, preview: preview});
+
+    localStorage.setItem("reports", JSON.stringify(oldReports));
+
+    // console.log(formData);
+
+    alert("Report submitted successully");
+
+    setFormData({
+      name: "",
+      phone: "",
+      location: "",
+      animalType: "",
+      description: "",
+      file: null,
+    });
+
+    setPreview(null);
+    setFileName("No file chosen");
     
    }
 
@@ -119,6 +141,13 @@ function Report() {
               onChange={handleFileChange}
               className="hidden"
             />
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-4 w-full h-60 object-cover rounded-lg"
+              />
+            )}
         </div>
 
 
